@@ -1,6 +1,5 @@
 package view;
 
-import database.DBSingleton;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -10,14 +9,18 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import model.user.Admin;
 import model.user.User;
 import model.user.UserController;
+import view.admin.CompleteAccountPage;
+import view.customer.CustomerDashboard;
 
 public class LoginPage{
 
 	private Scene scene;
 	private Label emailLbl, passwordLbl, errorLbl;
-	private TextField emailTF, passwordTF;
+	private TextField emailTF;
+	private PasswordField passwordTF;
 	private Button loginBtn, registerBtn;
 	private GridPane gridPane;
 	private HBox hBox;
@@ -36,7 +39,7 @@ public class LoginPage{
 		passwordTF = new PasswordField();
 		errorLbl = new Label();
 		hBox = new HBox();
-		scene = new Scene(gridPane, 800, 500);
+		scene = new Scene(gridPane, Main.WINDOW_WIDTH, Main.WINDOW_HEIGTH);
 		
 	}
 	
@@ -62,10 +65,17 @@ public class LoginPage{
 		loginBtn.setOnAction(e -> {			
 			User user = uc.login(emailTF, passwordTF, errorLbl);
 			Main.setUser(user);
+			
+			if(user == null) return;
+			if(user instanceof Admin) {
+				new CompleteAccountPage();
+			} else {
+				new CustomerDashboard();
+			}
 		});
 		
 		registerBtn.setOnAction(e -> {
-			System.out.println("To RegisterPage");
+			new RegisterPage();
 		});
 	}
 	
