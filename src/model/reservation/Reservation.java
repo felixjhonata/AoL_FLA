@@ -33,10 +33,6 @@ public class Reservation {
 		return id;
 	}
 
-	public void setId(String id) {
-		this.id = id;
-	}
-
 	public RoomType getRoomType() {
 		return roomType;
 	}

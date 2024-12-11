@@ -1,11 +1,15 @@
 package view.admin;
 
+import javafx.scene.control.TableView;
+import model.reservation.Reservation;
+
 public class ReservationPage extends AdminPageTemplate{
+	
+	private TableView<Reservation> reservationTV;
 
 	@Override
 	protected void init() {
-		// TODO Auto-generated method stub
-		
+		reservationTV = new TableView<Reservation>();		
 	}
 
 	@Override
