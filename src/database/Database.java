@@ -2,11 +2,20 @@ package database;
 
 import model.hotel.Hotel;
 import model.hotel.RoomType;
+import model.reservation.Card;
+import model.reservation.Cash;
+import model.reservation.EWallet;
+import model.reservation.PaidState;
+import model.reservation.PaymentMethod;
+import model.reservation.Reservation;
+import model.reservation.ReservationState;
+import model.reservation.UnPaidState;
 import model.user.Admin;
 import model.user.Customer;
 import model.user.User;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,7 +29,6 @@ public class Database {
 	String password = "";
 	Connection connection;
 	PreparedStatement ps;
-	ResultSet rs;
 	
 	Database() {
 		try {
@@ -73,7 +81,7 @@ public class Database {
 			ps = connection.prepareStatement(query);
 			ps.setString(1, hotelID);
 			
-			rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery();
 			
 			while(rs.next()) {
 				facilities.add(rs.getString(2));
@@ -99,7 +107,7 @@ public class Database {
 		try {
 			ps = connection.prepareStatement(query);
 			ps.setString(1, hotelID);
-			rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery();
 			
 			while(rs.next()) {
 				RoomType roomType = new RoomType(rs.getString(2), rs.getDouble(3), rs.getString(4), rs.getBoolean(5), rs.getInt(6));
@@ -120,7 +128,7 @@ public class Database {
 		try {
 			ps = connection.prepareStatement(query);
 			ps.setString(1, adminID);
-			rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery();
 			
 			if(rs.next()) {				
 				String hotelID = rs.getString(1);
@@ -151,7 +159,7 @@ public class Database {
 			ps.setString(1, email);
 			ps.setString(2, password);
 			
-			rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery();
 			
 			if(rs.next()) {
 				String id = rs.getString(1);
@@ -291,5 +299,265 @@ public class Database {
 			e.printStackTrace();
 		}
 		return false;
+	}
+	
+	public Customer getCustomerByID(String customerID) {
+		
+		String query = "SELECT * FROM users WHERE id = ?;";
+		Customer customer = null;
+		
+		try {
+			ps = connection.prepareStatement(query);
+			
+			ps.setString(1, customerID);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			if(rs.next()) {
+				customer = new Customer(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return customer;
+		
+	}
+	
+	public RoomType getRoomType(String hotelID, String typeName) {
+		RoomType roomType = null;
+		
+		String query = "SELECT * FROM roomtype WHERE hotelID = ? AND name = ?";
+		
+		try {
+			ps = connection.prepareStatement(query);
+			ps.setString(1, hotelID);
+			ps.setString(2, typeName);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			if(rs.next()) {
+				roomType = new RoomType(typeName, rs.getDouble(3), rs.getString(4), rs.getBoolean(5), rs.getInt(6));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return roomType;
+	}
+	
+	public List<Reservation> getReservationByHotel(Hotel hotel) {
+		
+		List<Reservation> reservationList = new ArrayList<>();
+		
+		String query = "SELECT * FROM reservation WHERE hotelID = ?;";
+		
+		try {
+			ps = connection.prepareStatement(query);			
+			ps.setString(1, hotel.getId());
+			ResultSet rs = ps.executeQuery();
+			
+			while(rs.next()) {
+				
+				RoomType roomType = getRoomType(hotel.getId(), rs.getString(4));
+				Customer customer = getCustomerByID(rs.getString(3));
+				ReservationState state = 
+						"Paid".equals(rs.getString(8))
+						? new PaidState() : new UnPaidState();
+				PaymentMethod paymentMethod;
+				
+				switch(rs.getString(9)) {
+				case "Cash":
+					paymentMethod = new Cash();
+					break;
+				case "Card":
+					paymentMethod = new Card();
+					break;
+				default:
+					paymentMethod = new EWallet();
+				}
+				
+				Reservation reservation = new Reservation(rs.getString(1), roomType, customer, hotel, rs.getDate(5), rs.getDate(6), rs.getInt(7), state, paymentMethod);
+				reservationList.add(reservation);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return reservationList;
+		
+	}
+	
+	public List<String> getCustomersID() {
+		
+		List<String> customerIDs = new ArrayList<>();
+		
+		String query = "SELECT id FROM users WHERE role = 'customer';";
+		
+		try {
+			ps = connection.prepareStatement(query);
+			ResultSet rs = ps.executeQuery();
+			
+			while(rs.next()) {
+				customerIDs.add(rs.getString(1));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return customerIDs;
+		
+	}
+	
+	public Reservation addReservation(Reservation reservation) {
+		
+		String query = "INSERT INTO reservation VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		
+		try {
+			ps = connection.prepareStatement(query);
+			ps.setString(1, reservation.getId());
+			ps.setString(2, reservation.getHotel().getId());
+			ps.setString(3, reservation.getCustomer().getId());
+			ps.setString(4, reservation.getRoomType().getName());
+			ps.setDate(5, new Date(reservation.getCheckInDate().getTime()));
+			ps.setDate(6, new Date(reservation.getCheckOutDate().getTime()));
+			ps.setInt(7, reservation.getRoomAmount());
+			ps.setString(8, reservation.getState().toString());
+			ps.setString(9, reservation.getPaymentMethod().toString());
+			
+			ps.execute();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			reservation = null;
+		}		
+		
+		return reservation;
+		
+	}
+
+	public boolean removeReservation(String id) {
+		String query = "DELETE FROM reservation WHERE id = ?;";
+		
+		try {
+			ps = connection.prepareStatement(query);
+			ps.setString(1, id);
+			
+			ps.execute();
+			return true;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+
+	public void updateReservationStatus(String reservationID, ReservationState newStatus) {
+		
+		String query = "UPDATE reservation SET state = ? WHERE id = ?;";
+		
+		try {
+			ps = connection.prepareStatement(query);
+			ps.setString(1, newStatus.toString());
+			ps.setString(2, reservationID);
+			
+			ps.execute();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public List<Reservation> getReservationByCustomer(Customer customer) {
+		List<Reservation> reservationList = new ArrayList<>();
+		
+		String query = "SELECT * FROM reservation WHERE customerID = ?;";
+		
+		try {
+			ps = connection.prepareStatement(query);
+			ps.setString(1, customer.getId());
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while(rs.next()) {
+				
+				Hotel hotel = getHotelByID(rs.getString(2));
+				RoomType roomType = getRoomType(hotel.getId(), rs.getString(4));
+				ReservationState state = 
+						"Paid".equals(rs.getString(8))
+						? new PaidState() : new UnPaidState();
+				PaymentMethod paymentMethod;
+				
+				switch(rs.getString(9)) {
+				case "Cash":
+					paymentMethod = new Cash();
+					break;
+				case "Card":
+					paymentMethod = new Card();
+					break;
+				default:
+					paymentMethod = new EWallet();
+				}
+				
+				Reservation reservation = new Reservation(rs.getString(1), roomType, customer, hotel, rs.getDate(5), rs.getDate(6), rs.getInt(7), state, paymentMethod);
+				reservationList.add(reservation);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		return reservationList;
+	}
+
+	public Hotel getHotelByID(String hotelID) {
+		
+		Hotel hotel = null;
+		
+		String query = "SELECT * FROM hotels WHERE id = ?;";
+		
+		try {
+			ps = connection.prepareStatement(query);
+			ps.setString(1, hotelID);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			if(rs.next()) {
+				hotel = new Hotel(hotelID, rs.getString(2), rs.getString(3), rs.getInt(4), getFacilitiesByHotelID(hotelID), getRoomTypesByHotelID(hotelID));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return hotel;
+	}
+
+	public List<String> getAllHotelID() {
+		List<String> hotelIDs = new ArrayList<>();
+		
+		String query = "SELECT * FROM hotels";
+		
+		try {
+			ps = connection.prepareStatement(query);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			while(rs.next()) {
+				hotelIDs.add(rs.getString(1));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		return hotelIDs;
 	}
 }

@@ -1,5 +1,8 @@
 package model.hotel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import database.DBSingleton;
 import database.Database;
 import javafx.scene.control.CheckBox;
@@ -162,6 +165,23 @@ public class HotelController {
 		}
 		
 		return isSuccessful;
+	}
+	
+	public List<String> getRoomTypeNames(Hotel hotel) {
+		List<String> roomTypeNames = new ArrayList<>();
+		
+		for(RoomType roomType : hotel.getRoomTypes()) {
+			roomTypeNames.add(roomType.getName());
+		}
+		return roomTypeNames;
+	}
+	
+	public List<String> getAllHotelID() {
+		return db.getAllHotelID();
+	}
+	
+	public Hotel getHotelByID(String hotelID) {
+		return db.getHotelByID(hotelID);
 	}
 
 }

@@ -1,6 +1,6 @@
 package model.reservation;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 import model.hotel.Hotel;
 import model.hotel.RoomType;
@@ -12,12 +12,13 @@ public class Reservation {
 	RoomType roomType;
 	Customer customer;
 	Hotel hotel;
-	LocalDate checkInDate, checkOutDate;
+	Date checkInDate, checkOutDate;
 	int roomAmount;
 	ReservationState state;
+	PaymentMethod paymentMethod;
 	
-	public Reservation(String id, RoomType roomType, Customer customer, Hotel hotel, LocalDate checkInDate,
-			LocalDate checkOutDate, int roomAmount, ReservationState state) {
+	public Reservation(String id, RoomType roomType, Customer customer, Hotel hotel, Date checkInDate,
+			Date checkOutDate, int roomAmount, ReservationState state, PaymentMethod paymentMethod) {
 		super();
 		this.id = id;
 		this.roomType = roomType;
@@ -27,6 +28,7 @@ public class Reservation {
 		this.checkOutDate = checkOutDate;
 		this.roomAmount = roomAmount;
 		this.state = state;
+		this.paymentMethod = paymentMethod;
 	}
 
 	public String getId() {
@@ -57,19 +59,19 @@ public class Reservation {
 		this.hotel = hotel;
 	}
 
-	public LocalDate getCheckInDate() {
+	public Date getCheckInDate() {
 		return checkInDate;
 	}
 
-	public void setCheckInDate(LocalDate checkInDate) {
+	public void setCheckInDate(Date checkInDate) {
 		this.checkInDate = checkInDate;
 	}
 
-	public LocalDate getCheckOutDate() {
+	public Date getCheckOutDate() {
 		return checkOutDate;
 	}
 
-	public void setCheckOutDate(LocalDate checkOutDate) {
+	public void setCheckOutDate(Date checkOutDate) {
 		this.checkOutDate = checkOutDate;
 	}
 
@@ -89,4 +91,11 @@ public class Reservation {
 		this.state = state;
 	}
 
+	public PaymentMethod getPaymentMethod() {
+		return paymentMethod;
+	}
+
+	public void setPaymentMethod(PaymentMethod paymentMethod) {
+		this.paymentMethod = paymentMethod;
+	}
 }

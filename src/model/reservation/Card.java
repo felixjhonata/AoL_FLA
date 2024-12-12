@@ -6,9 +6,9 @@ public class Card implements PaymentMethod{
 
 	@Override
 	public boolean pay(User user, double amount) {
-		// TODO: Make Card Payment Logic here
+		System.out.println("Paid with " + this.toString() + " with total: " + amount);
 		
-		return false;
+		return true;
 	}
 	
 	@Override

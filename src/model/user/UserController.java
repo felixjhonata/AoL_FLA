@@ -1,5 +1,6 @@
 package model.user;
 
+import java.util.List;
 import java.util.Random;
 
 import database.DBSingleton;
@@ -116,6 +117,12 @@ public class UserController {
 		passwordTF.setText("");
 		roleCB.setValue(null);
 		return user;
+	}
+	
+	public List<String> getCustomersID() {
+		
+		return db.getCustomersID();
+		
 	}
 
 }

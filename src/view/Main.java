@@ -9,8 +9,8 @@ public class Main extends Application{
 	
 	private static Stage stage;
 	private static User user;
-	public static final int WINDOW_WIDTH = 800;
-	public static final int WINDOW_HEIGTH = 500;
+	public static final int WINDOW_WIDTH = 1300;
+	public static final int WINDOW_HEIGTH = 800;
 	
 	public static User getUser() {
 		return user;

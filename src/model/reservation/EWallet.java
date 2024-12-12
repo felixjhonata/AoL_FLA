@@ -6,8 +6,9 @@ public class EWallet implements PaymentMethod{
 
 	@Override
 	public boolean pay(User user, double amount) {
-		// TODO: Make E-Wallet payment logic here
-		return false;
+		System.out.println("Paid with " + this.toString() + " with total: " + amount);
+		
+		return true;
 	}
 	
 	@Override

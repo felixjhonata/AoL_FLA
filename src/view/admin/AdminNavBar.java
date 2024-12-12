@@ -7,16 +7,17 @@ import view.Main;
 
 public class AdminNavBar extends HBox{
 
-	private Button hotelFacility, roomType, logoutBtn;
+	private Button hotelFacility, roomType, logoutBtn, reservation;
 	
 	private void init() {
+		reservation = new Button("Reservation");
 		hotelFacility = new Button("Hotel Facility");
 		roomType = new Button("Room Type");
 		logoutBtn = new Button("Logout");
 	}
 	
 	private void setPosition() {
-		this.getChildren().addAll(hotelFacility, roomType, logoutBtn);
+		this.getChildren().addAll(hotelFacility, roomType, reservation, logoutBtn);
 		this.setSpacing(5);
 	}
 	
@@ -34,6 +35,10 @@ public class AdminNavBar extends HBox{
 		
 		roomType.setOnAction(e -> {
 			new RoomTypePage();
+		});
+		
+		reservation.setOnAction(e -> {
+			new ReservationPage();
 		});
 	}
 	

@@ -6,8 +6,9 @@ public class Cash implements PaymentMethod{
 
 	@Override
 	public boolean pay(User user, double amount) {
-		// TODO: Make Cash Payment logic here
-		return false;
+		System.out.println("Paid with " + this.toString() + " with total: " + amount);
+		
+		return true;
 	}
 	
 	@Override

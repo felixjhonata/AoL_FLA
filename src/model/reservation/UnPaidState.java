@@ -7,7 +7,7 @@ public class UnPaidState implements ReservationState{
 		System.out.println("Change status to Paid!");
 		return new PaidState();
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Unpaid";

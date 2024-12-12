@@ -17,8 +17,8 @@ public abstract class AdminPageTemplate {
 		
 		navBar = new AdminNavBar();
 		init();
-		setPosition();
 		setTable();
+		setPosition();
 		setFunctionality();
 		Main.redirect(scene);
 		
