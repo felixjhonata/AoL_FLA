@@ -69,7 +69,7 @@ public class CustomerDashboard {
 		vbox = new VBox();
 		
 		title = new Label("Add Reservation");
-		hotelLbl = new Label("Customer: ");
+		hotelLbl = new Label("Hotel: ");
 		roomTypeLbl = new Label("Room Type: ");
 		checkInLbl = new Label("Check In Date: ");
 		checkOutLbl = new Label("Check Out Date");
@@ -201,6 +201,7 @@ public class CustomerDashboard {
 	}
 	
 	private void setRoomOptions() {
+		roomCB.getItems().clear();
 		roomCB.getItems().addAll(hc.getRoomTypeNames(selectedHotel));
 	}
 	
@@ -211,6 +212,8 @@ public class CustomerDashboard {
 		});
 		
 		hotelCB.setOnAction(e -> {
+			selectedHotel = hc.getHotelByID(hotelCB.getValue());
+			
 			setRoomOptions();
 			refreshTable();
 		});
